@@ -1,6 +1,6 @@
-# app/schemas.py
 from typing import Optional, List
 from pydantic import BaseModel
+from datetime import datetime
 
 class SnippetCreate(BaseModel):
     title: str
@@ -20,8 +20,9 @@ class SnippetRead(BaseModel):
     content: str
     category: Optional[str] = None
     tags: Optional[List[str]] = None
-    created_at: str
-    updated_at: Optional[str] = None
+    created_at: datetime
+    updated_at: Optional[datetime] = None
 
     class Config:
-        orm_mode = True
+        from_attributes = True
+

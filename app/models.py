@@ -1,4 +1,3 @@
-# app/models.py
 from typing import Optional
 from sqlmodel import SQLModel, Field
 from datetime import datetime
@@ -8,6 +7,6 @@ class Snippet(SQLModel, table=True):
     title: str
     content: str
     category: Optional[str] = None
-    tags: Optional[str] = None  # store comma-separated tags for simplicity
-    created_at: str = Field(default_factory=lambda: datetime.utcnow().isoformat())
-    updated_at: Optional[str] = None
+    tags: Optional[str] = None  # comma-separated tags
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: Optional[datetime] = None

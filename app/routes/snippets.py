@@ -10,22 +10,21 @@ router = APIRouter(prefix="/snippets", tags=["snippets"])
 
 @router.post("/", response_model=SnippetRead, status_code=status.HTTP_201_CREATED)
 def create(payload: SnippetCreate, session: Session = Depends(get_session)):
-    s = crud.create_snippet(session, payload)
-    return SnippetRead.model_validate(s)
+    return crud.create_snippet(session, payload)
 
 @router.get("/{snippet_id}", response_model=SnippetRead)
 def read(snippet_id: int, session: Session = Depends(get_session)):
-    s = crud.get_snippet(session, snippet_id)
-    if not s:
+    snippet = crud.get_snippet(session, snippet_id)
+    if not snippet:
         raise HTTPException(status_code=404, detail="Snippet not found")
-    return SnippetRead.model_validate(s)
+    return snippet
 
 @router.put("/{snippet_id}", response_model=SnippetRead)
 def update(snippet_id: int, payload: SnippetUpdate, session: Session = Depends(get_session)):
-    s = crud.update_snippet(session, snippet_id, payload)
-    if not s:
+    snippet = crud.update_snippet(session, snippet_id, payload)
+    if not snippet:
         raise HTTPException(status_code=404, detail="Snippet not found")
-    return SnippetRead.model_validate(s)
+    return snippet
 
 @router.delete("/{snippet_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete(snippet_id: int, session: Session = Depends(get_session)):
@@ -36,5 +35,4 @@ def delete(snippet_id: int, session: Session = Depends(get_session)):
 
 @router.get("/", response_model=List[SnippetRead])
 def list_all(limit: int = 50, offset: int = 0, session: Session = Depends(get_session)):
-    snippets = crud.list_snippets(session, limit=limit, offset=offset)
-    return [SnippetRead.model_validate(s) for s in snippets]
+    return crud.list_snippets(session, limit=limit, offset=offset)
