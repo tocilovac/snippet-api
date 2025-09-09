@@ -1,5 +1,5 @@
 from typing import Optional, List
-from sqlmodel import Session
+from sqlmodel import Session, select
 from datetime import datetime
 from app.models import Snippet
 from app.schemas import SnippetRead
@@ -87,3 +87,28 @@ def update_snippet(session: Session, snippet_id: int, data) -> Optional[SnippetR
         "updated_at": snippet.updated_at
     }
     return SnippetRead.model_validate(snippet_dict)
+
+def delete_snippet(session: Session, snippet_id: int) -> bool:
+    snippet = session.get(Snippet, snippet_id)
+    if not snippet:
+        return False
+    session.delete(snippet)
+    session.commit()
+    cache_delete(f"snippet:{snippet_id}")
+    return True
+
+def list_snippets(session: Session, limit: int = 50, offset: int = 0) -> List[SnippetRead]:
+    snippets = session.exec(select(Snippet).offset(offset).limit(limit)).all()
+    result = []
+    for s in snippets:
+        snippet_dict = {
+            "id": s.id,
+            "title": s.title,
+            "content": s.content,
+            "category": s.category,
+            "tags": _str_to_tags(s.tags),
+            "created_at": s.created_at,
+            "updated_at": s.updated_at
+        }
+        result.append(SnippetRead.model_validate(snippet_dict))
+    return result

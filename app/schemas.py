@@ -24,5 +24,4 @@ class SnippetRead(BaseModel):
     updated_at: Optional[datetime] = None
 
     class Config:
-        from_attributes = True
-
+        from_attributes = True  # important for SQLModel objects
